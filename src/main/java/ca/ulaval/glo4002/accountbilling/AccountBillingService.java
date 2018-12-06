@@ -5,43 +5,44 @@ import java.util.List;
 public class AccountBillingService {
 
 	public void cancelInvoiceAndRedistributeFunds(BillId id) {
-		Bill bill = BillDAO.getInstance().findBill(id);
-		if (bill == null) {
+		Bill billToCancel = BillDAO.getInstance().findBill(id);
+		if (billToCancel == null) {
 			throw new BillNotFoundException();
-		}
+		}else {		
 
-        ClientId cid = bill.getClientId();
+           ClientId cid = billToCancel.getClientId();
         
-	    if (bill.isCancelled()) {
-	    	bill.cancel();
-	    }
-	    BillDAO.getInstance().persist(bill);
-
-		List<Allocation> allocations = bill.getAllocations();
-
-		for (Allocation al : allocations) {
-		  List<Bill> bills = BillDAO.getInstance().findAllByClient(cid); 
-		  int amountToDedistribute = al.getAmount();
-
-		  for (Bill currentBill : bills) {
-		    if (bill != currentBill) {
-			  int remainingAmount = currentBill.getRemainingAmount();						
-			  Allocation newAllocation;
-			  if (remainingAmount <= amountToDedistribute) { 
-			    newAllocation = new Allocation(remainingAmount);
-				amountToDedistribute -= remainingAmount;
-			   } else {
-			    newAllocation = new Allocation(amountToDedistribute);
-				amountToDedistribute = 0;
-			   }
+		    if (!billToCancel.isCancelled()) {
+		    	billToCancel.cancel();
+		    }
+		    BillDAO.getInstance().persist(billToCancel);
 	
-			    currentBill.addAllocation(newAllocation);					
-				BillDAO.getInstance().persist(currentBill);
-			  }
+			List<Allocation> allocations = billToCancel.getAllocations();
+
+			for (Allocation al : allocations) {
+			  List<Bill> bills = BillDAO.getInstance().findAllByClient(cid); 
+			  int amountToDedistribute = al.getAmount();
 	
-			  if (amountToDedistribute == 0) {
-			    break;
-			  }
+			  for (Bill currentBill : bills) {
+			    if (billToCancel != currentBill) {
+				  int remainingAmount = currentBill.getRemainingAmount();						
+				  Allocation newAllocation;
+				  if (remainingAmount <= amountToDedistribute) { 
+				    newAllocation = new Allocation(remainingAmount);
+					amountToDedistribute -= remainingAmount;
+				   } else {
+				    newAllocation = new Allocation(amountToDedistribute);
+					amountToDedistribute = 0;
+				   }
+		
+				    currentBill.addAllocation(newAllocation);					
+					BillDAO.getInstance().persist(currentBill);
+				  }
+		
+				  if (amountToDedistribute == 0) {
+				    break;
+				  }
+				}
 			}
 		}
 	}
