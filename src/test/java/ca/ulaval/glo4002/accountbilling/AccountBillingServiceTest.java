@@ -6,16 +6,21 @@ public class AccountBillingServiceTest {
 
 	
   @Test
-  public void asd(){
+  public void asd_thenBillIsCancel(){
     TestableAccountBillingService service = new TestableAccountBillingService();
-	  
+
+    //assert();
   }
 	
 	
-  class TestableAccountBillingService extends BillDAO{
-	  
-    public TestableAccountBillingService() {
-		
-	}
+  class TestableAccountBillingService extends  AccountBillingService {
+    
+
+    
+    protected void persistBill(Bill bill) {
+    	
+    }
+
+
   }
 }

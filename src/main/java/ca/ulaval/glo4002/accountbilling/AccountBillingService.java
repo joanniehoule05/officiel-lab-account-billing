@@ -12,7 +12,9 @@ public class AccountBillingService {
 
         ClientId cid = bill.getClientId();
         
-	    if (bill.isCancelled() != true) { bill.cancel();
+	    if (bill.isCancelled()) {
+	    	bill.cancel();
+	    }
 	    BillDAO.getInstance().persist(bill);
 
 		List<Allocation> allocations = bill.getAllocations();
