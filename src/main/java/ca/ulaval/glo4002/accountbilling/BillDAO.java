@@ -20,7 +20,7 @@ public class BillDAO {
 		return instance;
 	}
 	
-	private BillDAO() {
+	public BillDAO() {
 	}
 
 	public Bill findBill(BillId id) {
